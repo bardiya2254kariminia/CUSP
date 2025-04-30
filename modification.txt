@@ -154,4 +154,4 @@ you have to clamp the ages in the [20,70] and its  only then  the network will l
 
 fixed the buggs and theh formula for the training phase:
 num k image = (epoches * max_num_images_in_dataset) / (batch_size  * 1000)
-the trained model is in 'network-snapshot-0000.pkl' at results directory and its okay to generate them later
+the trained model is in 'network-snapshot-0000.pkl' at '/results/00000-train_set-mirror-auto1-gamma10-kimg1-batch4-resumecustom-freezed0' directory and its okay to generate them later
