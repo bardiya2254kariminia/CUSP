@@ -18,6 +18,7 @@ import torch
 import dnnlib
 import json
 from argparse import Namespace
+import warnings
 
 import training.training_loop as training_loop
 # from metrics import metric_main
@@ -672,6 +673,7 @@ def main(ctx, outdir, dry_run, **config_kwargs):
 
 #----------------------------------------------------------------------------
 if __name__ == "__main__":
+    warnings.filterwarnings("ignore")
     with open("config.json" , "r") as f:
         config_kwargs = json.load(f)
         args = Namespace(**config_kwargs)

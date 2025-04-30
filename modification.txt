@@ -151,3 +151,7 @@ we  should make  the main.py file, to generate the output samples to
 and remove the torch warnings in the training phase,
 quess then we  should use the 0.008 as the answear for 18 epoches
 you have to clamp the ages in the [20,70] and its  only then  the network will learn
+
+fixed the buggs and theh formula for the training phase:
+num k image = (epoches * max_num_images_in_dataset) / (batch_size  * 1000)
+the trained model is in 'network-snapshot-0000.pkl' at results directory and its okay to generate them later

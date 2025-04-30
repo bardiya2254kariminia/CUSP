@@ -1,12 +1,13 @@
 {
+  "mode": "train",
   "gb": "Fixed",
   "msk": "Reversed",
   "num_gpus": 1,
   "gpu_list": [
     "0"
   ],
-  "image_snapshot_ticks": 1,
-  "network_snapshot_ticks": 20,
+  "image_snapshot_ticks": null,
+  "network_snapshot_ticks": 1,
   "metrics": [],
   "random_seed": 0,
   "training_set_kwargs": {
@@ -124,10 +125,10 @@
       "reduction": "mean"
     }
   },
-  "total_kimg": 0.004,
+  "total_kimg": 0.008,
   "batch_size": 1,
   "batch_gpu": 1,
-  "ema_kimg": 5,
+  "ema_kimg": 0.005,
   "ema_rampup": null,
   "resume_pkl": "/content/cusp_pytorch/pretrained.pkl",
   "run_dir": "/results"

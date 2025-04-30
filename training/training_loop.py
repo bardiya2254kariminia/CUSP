@@ -258,8 +258,8 @@ def training_loop(
         grid_ages = in_class
 
         images = generate_image_grid(G_ema, grid_images, grid_ages, groups=repeats_per_img)
-        save_image_grid(images, os.path.join(run_dir, 'fakes_init.jpeg'), drange=[-1, 1],
-                        grid_size=grid_size)
+        # save_image_grid(images, os.path.join(run_dir, 'fakes_init.jpeg'), drange=[-1, 1],
+        #                 grid_size=grid_size)
 
     # Initialize logs.
     if rank == 0:
@@ -384,7 +384,7 @@ def training_loop(
                     module = copy.deepcopy(module).eval().requires_grad_(False).cpu()
                 snapshot_data[name] = module
                 del module # conserve memory
-            snapshot_pkl = os.path.join(run_dir, f'network-snapshot-{cur_nimg//1000:06d}.pkl')
+            snapshot_pkl = os.path.join(run_dir, f'network-snapshot-0000.pkl')
             if rank == 0:
                 with open(snapshot_pkl, 'wb') as f:
                     pickle.dump(snapshot_data, f)
