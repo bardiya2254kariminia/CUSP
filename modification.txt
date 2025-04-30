@@ -1,0 +1,152 @@
+int the config.json you can tune the hyperparam for the model
+
+"dataset" : "ffhq_aug" -> means we have to set the datasets value like this
+
+
+
+{
+    "gb": "Fixed",
+    "msk": "Reversed",
+    "num_gpus": 1,
+    "gpu_list": [
+      "0"
+    ],
+    "image_snapshot_ticks": 1,
+    "network_snapshot_ticks": 20,
+    "metrics": [],
+    "random_seed": 0,
+    "training_set_kwargs": {
+      "class_name": "training.dataset.AgeDataset",
+      "age_np_path": "/content/cusp_pytorch/temp_dataset/cucp_temp.npy",
+      "image_path": "/content/cusp_pytorch/temp_dataset/train_set",
+      "max_size": 4,
+      "xflip": false,
+      "cmap_pre_kind": "number",
+      "resolution": 224,
+      "use_labels": true
+    },
+    "test_set_kwargs": {
+      "class_name": "training.dataset.AgeDataset",
+      "age_np_path": "/content/cusp_pytorch/temp_dataset/cucp_temp.npy",
+      "image_path": "/content/cusp_pytorch/temp_dataset/train_set",
+      "max_size": null,
+      "xflip": false,
+      "cmap_pre_kind": "number"
+    },
+    "data_loader_kwargs": {
+      "pin_memory": true,
+      "num_workers": 3,
+      "prefetch_factor": 2
+    },
+
+
+    "G_kwargs": {
+      "class_name": "training.networks.Image2Image",
+      "n_downsample": 5,
+      "mapping_kwargs": {},
+      "skip_layers": [
+        2
+      ],
+      "skip_kind": "linear",
+      "synthesis_kwargs": {
+        "channel_max": 512,
+        "bias": false,
+        "rgb_attention": false,
+        "num_fp16_res": 4,
+        "conv_clamp": 256
+      },
+      "blur_skip": true,
+      "skip_grad_blur": "gb",
+      "learn_mask": null,
+      "attr_dim": 101,
+      "blur_msk": "random",
+      "style_layers": 8,
+      "style_dim": 512,
+      "attr_layers": 8,
+      " ": {
+        "class_name": "training.loss.DEXAgeClassifier",
+        "vgg_path": "./dex_imdb_wiki.caffemodel.pt",
+        "own_relu": true
+      }
+    },
+
+    
+    "D_kwargs": {
+      "class_name": "training.networks.Discriminator",
+      "block_kwargs": {},
+      "mapping_kwargs": {},
+      "epilogue_kwargs": {
+        "mbstd_num_channels": 0
+      },
+      "channel_max": 512,
+      "num_fp16_res": 4,
+      "conv_clamp": 256
+    },
+    "G_opt_kwargs": {
+      "class_name": "torch.optim.Adam",
+      "lr": 0.0025,
+      "betas": [
+        0,
+        0.99
+      ],
+      "eps": 1e-08
+    },
+    "D_opt_kwargs": {
+      "class_name": "torch.optim.Adam",
+      "lr": 0.0025,
+      "betas": [
+        0,
+        0.99
+      ],
+      "eps": 1e-08
+    },
+    "loss_kwargs": {
+      "class_name": "training.loss.I2ILoss",
+      "r1_gamma": 0.56,
+      "loss_weights": {
+        "rec": 10,
+        "cla": 0.1,
+        "adv": 1,
+        "rgb": 1,
+        "act": 1,
+        "msk": 0.1,
+        "msk_smooth": 1e-05,
+        "cam": 10,
+        "fre": 0.0,
+        "cycle": 10.0
+      },
+      "rgb_reg": null,
+      "act_reg": "l2",
+      "mixing_probability": 0.0,
+      "disc_class": true,
+      "classifier_kwargs": {
+        "class_name": "training.loss.DEXAgeClassifier",
+        "vgg_path": "./dex_imdb_wiki.caffemodel.pt",
+        "own_relu": true
+      },
+      "random_class_kwargs": {
+        "class_name": "training.loss.SoftMarginRandomAge",
+        "age_min": 20,
+        "age_max": 70
+      },
+      "classification_loss_kwargs": {
+        "class_name": "training.loss.MeanVarLoss",
+        "reduction": "mean"
+      }
+    },
+    "total_kimg": 0.008,
+    "batch_size": 2,
+    "batch_gpu": 2,
+    "ema_kimg": 5,
+    "ema_rampup": null,
+    "resume_pkl": "/content/cusp_pytorch/pretrained.pkl",
+    "run_dir": "/results"
+  }
+  
+  
+
+with total_kimg: 0.004  -> 8+1 epoch  
+now  that we find the way to train it:
+we  should make  the main.py file, to generate the output samples to
+and remove the torch warnings in the training phase,
+quess then we  should use the 0.008 as the answear for 18 epoches
