@@ -54,7 +54,10 @@ def save_image_grid(img, fname, drange, grid_size):
     img = np.rint(img).clip(0, 255).astype(np.uint8)
 
     gw, gh = grid_size
+    print("----------")
+    print(img.shape)
     _N, C, H, W = img.shape
+    PIL.Image.fromarray(img.squeeze(0), 'RGB').save(fname)
     img = img.reshape(gh, gw, C, H, W)
     img = img.transpose(0, 3, 1, 4, 2)
     img = img.reshape(gh * H, gw * W, C)
@@ -63,14 +66,14 @@ def save_image_grid(img, fname, drange, grid_size):
     if C == 1:
         PIL.Image.fromarray(img[:, :, 0], 'L').save(fname)
     if C == 3:
-        PIL.Image.fromarray(img, 'RGB').save(fname)
+        PIL.Image.fromarray(img.squeeze(dim=0), 'RGB').save(fname)
 
 #----------------------------------------------------------------------------
 
 def generate_image_grid(G_ema,in_images,in_labels,groups=1):
     # Transform images
     im_shape = in_images[0].shape[-1]
-    tr_images = torch.cat([G_ema(im, cl).detach().cpu() for im, cl in zip(in_images, in_labels)], dim=0)
+    tr_images = torch.cat([G_ema(im, cl).detach().cpu() for im, cl in zip([in_images[0]], [in_labels[0]])], dim=0)
     # Original image
     ori_images = torch.cat(in_images)[::groups].detach().cpu()
 
@@ -78,8 +81,9 @@ def generate_image_grid(G_ema,in_images,in_labels,groups=1):
     n_samples = tr_images.size(0)//groups
     tr_images = tr_images.view(n_samples,groups,*tr_images.size()[1:])
 
-    join_images = torch.cat([ori_images[:,None],tr_images],dim=1)
-    images = join_images.view(-1, 3, im_shape, im_shape).numpy()
+    # join_images = torch.cat([ori_images[0,None],tr_images],dim=1)
+    # images = join_images.view(-1, 3, im_shape, im_shape).numpy()
+    images = tr_images
     return images
 
 #----------------------------------------------------------------------------
@@ -257,7 +261,9 @@ def training_loop(
         grid_images = in_images
         grid_ages = in_class
 
-        images = generate_image_grid(G_ema, grid_images, grid_ages, groups=repeats_per_img)
+        images = generate_image_grid(G_ema, grid_images, grid_ages, groups=1)
+        if len(images.shape)== 5:
+            images = images.squeeze(dim=0)
         # save_image_grid(images, os.path.join(run_dir, 'fakes_init.jpeg'), drange=[-1, 1],
         #                 grid_size=grid_size)
 
@@ -367,10 +373,10 @@ def training_loop(
                 print()
                 print('Aborting...')
 
-        # Save image snapshot.
-        if (rank == 0) and (image_snapshot_ticks is not None) and (done or cur_tick % image_snapshot_ticks == 0):
-            images = generate_image_grid(G_ema, grid_images, grid_ages, groups=repeats_per_img)
-            save_image_grid(images, os.path.join(run_dir, f'fakes{cur_nimg//1000:06d}.jpeg'), drange=[-1,1], grid_size=grid_size)
+        # # Save image snapshot.
+        # if (rank == 0) and (image_snapshot_ticks is not None) and (done or cur_tick % image_snapshot_ticks == 0):
+        #     images = generate_image_grid(G_ema, grid_images, grid_ages, groups=repeats_per_img)
+        #     save_image_grid(images, os.path.join(run_dir, f'fakes{cur_nimg//1000:06d}.jpeg'), drange=[-1,1], grid_size=grid_size)
 
         # Save network snapshot.
         snapshot_pkl = None
