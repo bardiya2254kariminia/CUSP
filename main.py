@@ -541,82 +541,6 @@ class CommaSeparatedList(click.ParamType):
         return value.split(',')
 
 #----------------------------------------------------------------------------
-
-# @click.command()
-# @click.pass_context
-
-# # General options.
-# @click.option('--outdir', help='Where to save the results', required=True, metavar='DIR')
-# @click.option('--gpus', help='GPUs to use [default: 0]', type=CommaSeparatedList())
-# @click.option('--snap', help='Snapshot interval [default: 50 ticks]', type=int, metavar='INT')
-# # @click.option('--metrics', help='Comma-separated list or "none" [default: fid50k_full]', type=CommaSeparatedList())
-# @click.option('--seed', help='Random seed [default: 0]', type=int, metavar='INT')
-# @click.option('-n', '--dry-run', help='Print training options and exit', is_flag=True)
-
-# # Dataset.
-# @click.option('--dataset', help='Dataset', required=True, type=click.Choice(['ffhq_aug','ffhq_lat','celeba','bdd100k','afhq','zebra']))
-# @click.option('--cmap_kind', help='Discriminator class mapping', type=click.Choice(["identity",'gauss','bins','number']))
-# @click.option('--age_np', help='[[img_path, age]] numpy', metavar='DIR')
-# @click.option('--age_np_test', help='[[img_path, age]] numpy', metavar='DIR')
-# @click.option('--csv', help='[[img_path, age]] numpy', metavar='DIR')
-# @click.option('--data', help='Training data (directory or zip)', metavar='PATH', required=True)
-# @click.option('--mirror', help='Enable dataset x-flips [default: false]', type=bool, metavar='BOOL')
-
-# # Discriminator
-# @click.option('--classifier_path', help='Classifier path', required=True)
-# @click.option('--mask_path', help='Classifier mask path')
-
-# # Base config.
-# @click.option('--cfg', help='Base config [default: auto]', type=click.Choice(['auto', '224','256']))
-# @click.option('--gamma', help='Override R1 gamma', type=float)
-# @click.option('--kimg', help='Override training duration', type=int, metavar='INT')
-# @click.option('--batch', help='Override batch size', type=int, metavar='INT')
-
-# # @click.option('--age_loss', help='Age loss [default: CrossEntropy]', type=click.Choice(['ce', 'mvl']))
-# @click.option('--downsamples', help='Number of generator downsamples (default 8)', type=int, metavar='INT')
-# @click.option('--bias', help='Use bias in Synthesis blocks [default: true]', type=bool, metavar='BOOL')
-# @click.option('--class_w', help='Classification weight [default: 0.1]', type=float, metavar='FLOAT')
-# @click.option('--cycle_w', help='Cycle consistency weight [default: 0.0]', type=float, metavar='FLOAT')
-# @click.option('--skip_layers', help='Layers for skip connect', type=CommaSeparatedList())
-# @click.option('--skip_kind', help='Skip connection modifier (cbam/linear) [default: "linear"]',
-#               type=click.Choice(['cbam', 'linear']))
-# @click.option('--age_margin', help='Margin from predicted for generator random age sampling', type=int, metavar='INT')
-# @click.option('--rgb_attention', help='Add attention on RGB [default: false]', type=bool, metavar='BOOL')
-# @click.option('--rgb_reg', help='RGB output regularization strategy ["none","std2","margin"]',
-#               type=click.Choice(['none','std2', 'margin']), default="none")
-# @click.option('--soft_margin', help='Soft margin [default: false]', type=bool, metavar='BOOL')
-# @click.option('--blur_skip', help='Train with random skip connection blur [default: false]', type=bool, metavar='BOOL')
-# @click.option('--blur_msk', help='Masked skip connection blur ["fixed","random"] [default: "fixed"]',
-#               type=click.Choice(["fixed","random"]), default="fixed")
-# @click.option('--act_reg', help='Activation regularization strategy ["none","l1","l2"]',
-#               type=click.Choice(['none','l1', 'l2']), default="none")
-# @click.option('--skip_grad_blur', help='Masked skip connection blur ["none","gb","camgb"]',
-#               type=click.Choice(["none","gb","camgb"]), default="none")
-# @click.option('--learn_mask', help='Learn masking ["none","skip","skip_cam","rgb","rgb_cam"]',
-#               type=click.Choice(["none"]+[f'{k}_{sufix}'
-#                                           for k in ["skip","skip_cam","rgb","rgb_cam"]
-#                                           for sufix in ['','random']]), default="none")
-# @click.option('--mixing_prob', help='Probability of style mixing [0,1] [default: 0.]', type=float)
-# @click.option('--disc_class', help='Pass class to StyleGAN discriminator', type=bool, metavar='BOOL')
-# @click.option('--fake_rec', help='Blurred reconstruction on fake images', type=bool, metavar='BOOL')
-# @click.option('--style_enc', help='Train separate style encoder [default: True]', type=bool, metavar='BOOL')
-# @click.option('--bottleneck_class', help='Class only on bottleneck [default: False]', type=bool, metavar='BOOL')
-# @click.option('--finetune', help='Finetune last n blocks [default: None]', type=int, metavar='BOOL')
-# @click.option('--class_kind', help='Classifier output seleccion (all/max) [default: "all"]',
-#               type=click.Choice(['all', 'max']))
-
-
-# # Transfer learning.
-# @click.option('--resume', help='Resume training [default: noresume]', metavar='PKL')
-# @click.option('--freezed', help='Freeze-D [default: 0 layers]', type=int, metavar='INT')
-
-# # Performance options.
-# @click.option('--fp32', help='Disable mixed-precision training', type=bool, metavar='BOOL')
-# @click.option('--nhwc', help='Use NHWC memory format with FP16', type=bool, metavar='BOOL')
-# @click.option('--nobench', help='Disable cuDNN benchmarking', type=bool, metavar='BOOL')
-# @click.option('--allow-tf32', help='Allow PyTorch to use TF32 internally', type=bool, metavar='BOOL')
-# @click.option('--workers', help='Override number of DataLoader workers', type=int, metavar='INT')
-
 def main(ctx, outdir, dry_run, **config_kwargs):
     dnnlib.util.Logger(should_flush=True)
 
@@ -672,6 +596,181 @@ def main(ctx, outdir, dry_run, **config_kwargs):
             torch.multiprocessing.spawn(fn=subprocess_fn, args=(args, temp_dir), nprocs=args.num_gpus)
 
 #----------------------------------------------------------------------------
+# Custom modules
+from training.networks import VGG, module_no_grad
+import legacy
+from torch_utils import misc
+import dnnlib
+import numpy as np
+import PIL
+import matplotlib.pyplot as plt
+
+def load_model(model_path,vgg_path,device):
+    with open(model_path,'rb') as f:
+        contents = legacy.load_network_pkl(f) # Pickles weights and source code
+
+    # Get exponential movign average model
+    G_ema = contents['G_ema']
+
+    # Load DEX VGG classifier
+    vgg = VGG()
+    vgg_state_dict = torch.load(vgg_path)
+    vgg_state_dict = {k.replace('-', '_'): v for k, v in vgg_state_dict.items()}
+    vgg.load_state_dict(vgg_state_dict)
+    module_no_grad(vgg) #!important
+
+    # Set classifier
+    G_ema.skip_grad_blur.model.classifier = vgg
+    # No grad
+    G_ema = G_ema.to(device).eval().requires_grad_(False)
+    # No grad on VGG
+
+    return G_ema
+
+def run_model(G, img, label:torch.Tensor, global_blur_val=None, mask_blur_val=None, return_msk = False):
+    # Tranform label to One Hot Encoding
+    cls = torch.nn.functional.one_hot(
+        torch.tensor(label.clip(20,65)),
+        num_classes=G.attr_map.fc0.init_args[0]
+    ).to(img.device)
+
+    # Content encoder
+    _,c_out_skip = G.content_enc(img)
+
+    # Style encodder
+    s_out = G.style_enc(img)[0].mean((2, 3))
+
+    truncation_psi=1
+    truncation_cutoff=None
+    s_out = G.style_map(s_out, None, truncation_psi, truncation_cutoff)
+
+    # age mapping
+    a_out = G.attr_map(cls.to(s_out.device), None, truncation_psi, truncation_cutoff)
+
+    # Style mapping and Age mapping are interleaved for the corresponding
+    # weight demodulation modules
+    w = G.__interleave_attr_style__(a_out, s_out)
+
+    # Global blur
+    for i,(f,_) in enumerate(zip(G.skip_transf, c_out_skip)):
+        if f is not None:
+            c_out_skip[i] = G._batch_blur(c_out_skip[i], blur_val = global_blur_val)
+
+    # Masked blur
+    cam = G.skip_grad_blur(img.float())
+    msk = cam
+    for i, (f, c) in enumerate(zip(G.skip_transf, c_out_skip)):
+        if f is not None:
+            im_size = c.size(-1)
+            blur_c = G._batch_blur(c, blur_val= mask_blur_val)
+            if msk.size(2) != im_size:
+                msk = F.interpolate(msk,size=(im_size,im_size), mode='area')
+            merged_c = c * msk + blur_c * (1 - msk)
+            c_out_skip[i] = merged_c
+
+
+    # Decoder
+    img_out = G.image_dec(c_out_skip, w)
+
+    if return_msk:
+        to_return = (img_out,msk,cam) if G.learn_mask is not None else (img_out,None,None)
+    else:
+        to_return = img_out
+
+    # assert(all(x.grad is None for x in G.parameters()))
+    # assert(all(x.grad is None for x in G.skip_grad_blur.model.get_classifier().parameters()))
+    # G.zero_grad()
+
+    return to_return
+
+# Transform tensor to uint8 image
+def to_uint8(im_tensor):
+    im_tensor = (im_tensor.detach().cpu().numpy().transpose((1,2,0))+1)*(256/2)
+    im_tensor = np.clip(im_tensor,0,255).astype(np.uint8)
+    return im_tensor
+
+def test(weights_path , vgg_path , sample_images_path):
+    weights_path = weights_path
+    vgg_path = vgg_path
+    # Images path
+    sample_images_path= sample_images_path
+    KEY = FFHQ_RR_KEY = "hrfae" # Model trained on HRFAE dataset
+    configs = {
+        FFHQ_RR_KEY: dict(
+            gdrive_id="17BOTEa6z3r6JFVs1KDutDxWEkTWbzaeD",
+            side=224,
+            classes=(20,65))
+    }
+
+    # CUDA device
+    device = torch.device('cuda',0)
+
+    # Model GDrive ID
+    model_id = configs[KEY]['gdrive_id']
+    # Side of input images
+    img_side = configs[KEY]['side']
+    # Labels range for examples generation
+    data_labels_range = configs[KEY]['classes']
+    filenames_batch = [
+    os.path.join(sample_images_path,f)
+    for  f in next(iter(os.walk(sample_images_path)))[2]
+    if f[-4:] == '.png'
+    ]
+
+    # loading the models weights
+    G_ema = load_model(
+    weights_path,
+    vgg_path,
+    device)
+
+    # Image side
+    side = configs[KEY]['side']
+    # Read images
+    imgs = [np.array(PIL.Image.open(f).resize((side,side)),dtype=np.float32).transpose((2,0,1)) for f in filenames_batch]
+    # Transform to tensors
+    im_in_tensor = (torch.tensor(np.array(imgs))/256*2-1).cuda() # Values {-1,1}
+
+    # Aging steps
+    steps = 5 # N steps
+    # Repeat images N times
+    n_images = im_in_tensor.shape[0]
+    im_in_tensor_exp = im_in_tensor[:,None].expand([n_images,steps,*im_in_tensor.shape[1:]]).reshape([-1,*im_in_tensor.shape[1:]])
+    # Define target ages
+    labels_exp = torch.tensor(np.repeat(np.linspace(*data_labels_range,steps,dtype=int)[:,None],n_images,1).T.reshape(-1))
+
+    batch_size = 12
+    # Run model
+    im_out_tensor_exp = torch.concat([run_model(
+        G_ema,
+        mini_im,
+        mini_label,
+        global_blur_val=0.2, # CUSP global blur
+        mask_blur_val=0.8)   # CUSP masked blur
+        for mini_im, mini_label
+        in zip(
+            im_in_tensor_exp.split(batch_size),
+            labels_exp.split(batch_size)
+        )])
+    # Transform to [batch_size, N_ages, W, H , C]
+    im_out_tensor = im_out_tensor_exp.reshape([-1,steps,*im_out_tensor_exp.shape[1:]])
+
+    generated_path = "result"
+    os.makedirs(generated_path , exist_ok=True)
+    for f_name ,im_out , lables in zip(filenames_batch, im_out_tensor , labels_exp.numpy().reshape(-1,steps)):
+        for img , l in zip(im_out, lables):
+            l = (l  //10) * 10
+            subdir_path = os.path.join(generated_path , str(l))
+            print(subdir_path)
+            os.makedirs(subdir_path , exist_ok=True)
+            img = to_uint8(img)
+            result_img = PIL.Image.fromarray(img)
+            save_path = os.path.join(subdir_path , f_name.split("/")[-1])
+            result_img.save(save_path)
+            print(save_path)
+        print("done!!!")
+
+
+#----------------------------------------------------------------------------
 if __name__ == "__main__":
     warnings.filterwarnings("ignore")
     with open("config.json" , "r") as f:
@@ -679,6 +778,11 @@ if __name__ == "__main__":
         args = Namespace(**config_kwargs)
     config_kwargs.pop('outdir', None)
     config_kwargs.pop('dry_run', None)
-    main(None ,args.outdir ,args.dry_run ,**config_kwargs) # pylint: disable=no-value-for-parameter
-
-#----------------------------------------------------------------------------
+    if args.mode == "train":
+        main(None ,args.outdir ,args.dry_run ,**config_kwargs) # pylint: disable=no-value-for-parameter
+    
+    # vgg_path
+    vgg_path = None
+    new_model_path=None 
+    test_dataset_path = None
+    test(vgg_path , new_model_path,test_dataset_path)
